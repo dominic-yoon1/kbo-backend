@@ -42,7 +42,7 @@ public class AuthService {
 	}
 
 	@Transactional
-	public LoginResponseDto login(LoginRequestDto req) {
+	public TokenDto login(LoginRequestDto req) {
 		// 1. email 존재 여부 확인
 		User user = userRepository.findByEmail(req.getEmail())
 			.orElseThrow(() -> new IllegalArgumentException("ID 혹은 PW가 잘 못 입력되었습니다."));

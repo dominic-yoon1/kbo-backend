@@ -23,10 +23,10 @@ public class AuthController {
 	private final AuthService authService;
 
 	@PostMapping("/signup")
-	public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto req) {
-		SignupResponseDto res = authService.signup(req);
+	public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto requestDto) {
+		SignupResponseDto responseDto = authService.signup(requestDto);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(res);
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
 
 	@PostMapping("/login")
