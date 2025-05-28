@@ -1,0 +1,39 @@
+package com.kbo.backend.application.service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.kbo.backend.application.response.SignupResponseDto;
+import com.kbo.backend.domain.model.User;
+import com.kbo.backend.domain.repository.UserRepository;
+import com.kbo.backend.presentation.request.SignupRequestDto;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class AuthService {
+
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+
+	@Transactional
+	public SignupResponseDto signup(SignupRequestDto req) {
+		// 1. email 중복 확인
+		if (userRepository.findByEmail(req.getEmail()).isPresent()) {
+			throw new IllegalArgumentException("Email already in use");
+		}
+
+		String encodedPassword = passwordEncoder.encode(req.getPassword());
+
+		// 2. 새로운 user 생성
+		User newUser = User.signup(req, encodedPassword);
+
+		// 3. 새로운 user DB 저장
+		userRepository.save(newUser);
+
+		return SignupResponseDto.from(newUser);
+	}
+}

@@ -55,4 +55,14 @@ public class User {
 	public void updateRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
+
+	public static User signup(SignupRequestDto req, String encodedPassword) {
+		return User.builder()
+			.email(req.getEmail())
+			.password(encodedPassword)
+			.username(req.getUsername())
+			.nickname(req.getNickname())
+			.role(Role.USER)
+			.build();
+	}
 }
