@@ -9,13 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginResponseDto {
+public class TokenDto {
 
 	private String accessToken;
+	private String refreshToken;
 
-	public static LoginResponseDto from(String accessToken) {
-		return LoginResponseDto.builder()
+	public static TokenDto from(String accessToken, String refreshToken) {
+		return TokenDto.builder()
 			.accessToken(accessToken)
+			.refreshToken(refreshToken)
 			.build();
 	}
 }
