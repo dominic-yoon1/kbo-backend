@@ -53,7 +53,7 @@ public class JwtTokenProvider {
 	 * @param user
 	 * @return 문자열 JWT 토큰
 	 */
-	public String createToken(User user) {
+	public String createAccessToken(User user) {
 		return Jwts.builder()
 			.setSubject(user.getEmail())
 			.claim("role", user.getRole().name())
