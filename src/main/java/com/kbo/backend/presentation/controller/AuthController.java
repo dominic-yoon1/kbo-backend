@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kbo.backend.application.response.LoginResponseDto;
 import com.kbo.backend.application.response.SignupResponseDto;
 import com.kbo.backend.application.service.AuthService;
+import com.kbo.backend.presentation.request.LoginRequestDto;
 import com.kbo.backend.presentation.request.SignupRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -25,5 +27,12 @@ public class AuthController {
 		SignupResponseDto res = authService.signup(req);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(res);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto req) {
+		LoginResponseDto res = authService.login(req);
+
+		return ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 }

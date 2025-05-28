@@ -4,9 +4,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kbo.backend.application.response.LoginResponseDto;
 import com.kbo.backend.application.response.SignupResponseDto;
 import com.kbo.backend.domain.model.User;
 import com.kbo.backend.domain.repository.UserRepository;
+import com.kbo.backend.infrastructure.security.JwtTokenProvider;
+import com.kbo.backend.presentation.request.LoginRequestDto;
 import com.kbo.backend.presentation.request.SignupRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class AuthService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtTokenProvider jwtTokenProvider;
 
 	@Transactional
 	public SignupResponseDto signup(SignupRequestDto req) {
@@ -35,5 +39,22 @@ public class AuthService {
 		userRepository.save(newUser);
 
 		return SignupResponseDto.from(newUser);
+	}
+
+	@Transactional
+	public LoginResponseDto login(LoginRequestDto req) {
+		// 1. email 존재 여부 확인
+		User user = userRepository.findByEmail(req.getEmail())
+			.orElseThrow(() -> new IllegalArgumentException("ID 혹은 PW가 잘 못 입력되었습니다."));
+
+		// 2. 비밀번호 확인
+		if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+			throw new IllegalArgumentException("ID 혹은 PW가 잘 못 입력되었습니다.");
+		}
+
+		// 3. JWT 생성
+		String token = jwtTokenProvider.createToken(user);
+
+		return LoginResponseDto.from(token);
 	}
 }
