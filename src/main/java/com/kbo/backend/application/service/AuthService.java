@@ -66,6 +66,7 @@ public class AuthService {
 		return TokenDto.from(accessToken, refreshToken);
 	}
 
+	@Transactional
 	public TokenDto refreshToken(RefreshTokenRequestDto requestDto) {
 		String refreshToken = requestDto.getRefreshToken();
 
@@ -86,5 +87,18 @@ public class AuthService {
 
 		// 5. 응답 포맷 반환
 		return TokenDto.from(newAccessToken, user.getRefreshToken());
+	}
+
+	@Transactional
+	public void logout(String email) {
+		// 1. email로 사용자 조회
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
+
+		// 2. 사용자 객체에서 refreshToken 제거
+		user.updateRefreshToken(null);
+
+		// 3. 변경사항 저장
+		userRepository.save(user);
 	}
 }

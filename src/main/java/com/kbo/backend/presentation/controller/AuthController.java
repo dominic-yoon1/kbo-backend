@@ -1,5 +1,6 @@
 package com.kbo.backend.presentation.controller;
 
+import java.security.Principal;
 import java.time.Duration;
 
 import org.springframework.http.HttpStatus;
@@ -61,5 +62,27 @@ public class AuthController {
 		TokenDto tokenDto = authService.refreshToken(requestDto);
 
 		return ResponseEntity.status(HttpStatus.OK).body(LoginResponseDto.from(tokenDto.getAccessToken()));
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<Void> logout(Principal principal, HttpServletResponse res) {
+		// 1. 현재 인증된 사용자 정보에서 email 추출
+		String email = principal.getName();
+
+		// 2. DB에서 해당 사용자의 refreshToken 삭제
+		authService.logout(email);
+
+		// 3. 클라이언트의 refreshToken 쿠키 제거
+		ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+			.httpOnly(true)
+			.secure(false)
+			.path("/")
+			.maxAge(0)
+			.sameSite("Strict")
+			.build();
+
+		res.setHeader("Set-Cookie", deleteCookie.toString());
+
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 }
