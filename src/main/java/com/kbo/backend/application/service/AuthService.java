@@ -4,8 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kbo.backend.application.response.LoginResponseDto;
 import com.kbo.backend.application.response.SignupResponseDto;
+import com.kbo.backend.application.response.TokenDto;
 import com.kbo.backend.domain.model.User;
 import com.kbo.backend.domain.repository.UserRepository;
 import com.kbo.backend.infrastructure.security.JwtTokenProvider;
@@ -53,7 +53,17 @@ public class AuthService {
 		}
 
 		// 3. JWT 생성
-		String token = jwtTokenProvider.createToken(user);
+		String accessToken = jwtTokenProvider.createAccessToken(user);
+		String refreshToken = jwtTokenProvider.createRefreshToken(user);
+
+		// 4. user에 refresh token 추가
+		user.updateRefreshToken(refreshToken);
+
+		// 5. update 된 user DB 저장
+		userRepository.save(user);
+
+		return TokenDto.from(accessToken, refreshToken);
+	}
 
 		return LoginResponseDto.from(token);
 	}
