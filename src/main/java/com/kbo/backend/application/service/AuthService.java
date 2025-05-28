@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kbo.backend.application.response.MyInfoResponseDto;
 import com.kbo.backend.application.response.SignupResponseDto;
 import com.kbo.backend.application.response.TokenDto;
 import com.kbo.backend.domain.model.User;
@@ -100,5 +101,14 @@ public class AuthService {
 
 		// 3. 변경사항 저장
 		userRepository.save(user);
+	}
+
+	public MyInfoResponseDto myInfo(String email) {
+		// 1. email로 사용자 조회
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
+
+		// 2. 조회된 사용자 정보 반환
+		return MyInfoResponseDto.from(user);
 	}
 }

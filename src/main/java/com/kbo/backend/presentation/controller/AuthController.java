@@ -6,12 +6,14 @@ import java.time.Duration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kbo.backend.application.response.LoginResponseDto;
+import com.kbo.backend.application.response.MyInfoResponseDto;
 import com.kbo.backend.application.response.SignupResponseDto;
 import com.kbo.backend.application.response.TokenDto;
 import com.kbo.backend.application.service.AuthService;
@@ -84,5 +86,16 @@ public class AuthController {
 		res.setHeader("Set-Cookie", deleteCookie.toString());
 
 		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+
+	@GetMapping("/my-info")
+	public ResponseEntity<MyInfoResponseDto> myInfo(Principal principal) {
+		// 1. 현재 인증된 사용자 정보에서 email 추출
+		String email = principal.getName();
+
+		// 2. DB에서 해당 사용자 정보 조회
+		MyInfoResponseDto responseDto = authService.myInfo(email);
+
+		return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 	}
 }
