@@ -15,6 +15,7 @@ import com.kbo.backend.application.response.SignupResponseDto;
 import com.kbo.backend.application.response.TokenDto;
 import com.kbo.backend.application.service.AuthService;
 import com.kbo.backend.presentation.request.LoginRequestDto;
+import com.kbo.backend.presentation.request.RefreshTokenRequestDto;
 import com.kbo.backend.presentation.request.SignupRequestDto;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,6 +56,10 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.OK).body(LoginResponseDto.from(tokenDto.getAccessToken()));
 	}
 
-		return ResponseEntity.status(HttpStatus.OK).body(res);
+	@PostMapping("/token/refresh")
+	public ResponseEntity<LoginResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto requestDto) {
+		TokenDto tokenDto = authService.refreshToken(requestDto);
+
+		return ResponseEntity.status(HttpStatus.OK).body(LoginResponseDto.from(tokenDto.getAccessToken()));
 	}
 }

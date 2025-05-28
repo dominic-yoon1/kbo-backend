@@ -10,6 +10,7 @@ import com.kbo.backend.domain.model.User;
 import com.kbo.backend.domain.repository.UserRepository;
 import com.kbo.backend.infrastructure.security.JwtTokenProvider;
 import com.kbo.backend.presentation.request.LoginRequestDto;
+import com.kbo.backend.presentation.request.RefreshTokenRequestDto;
 import com.kbo.backend.presentation.request.SignupRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -65,6 +66,25 @@ public class AuthService {
 		return TokenDto.from(accessToken, refreshToken);
 	}
 
-		return LoginResponseDto.from(token);
+	public TokenDto refreshToken(RefreshTokenRequestDto requestDto) {
+		String refreshToken = requestDto.getRefreshToken();
+
+		// 1. 토큰 유효성 검사
+		if (!jwtTokenProvider.validateToken(refreshToken)) {
+			throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
+		}
+
+		// 2. 사용자 이메일 추출
+		String email = jwtTokenProvider.getUserEmailFromToken(refreshToken);
+
+		// 3. 사용자 조회
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
+
+		// 4. 새 Access Token 발급
+		String newAccessToken = jwtTokenProvider.createAccessToken(user);
+
+		// 5. 응답 포맷 반환
+		return TokenDto.from(newAccessToken, user.getRefreshToken());
 	}
 }
