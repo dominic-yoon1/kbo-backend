@@ -25,16 +25,16 @@ public class AuthService {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Transactional
-	public SignupResponseDto signup(SignupRequestDto req) {
+	public SignupResponseDto signup(SignupRequestDto requestDto) {
 		// 1. email 중복 확인
-		if (userRepository.findByEmail(req.getEmail()).isPresent()) {
+		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
 			throw new IllegalArgumentException("Email already in use");
 		}
 
-		String encodedPassword = passwordEncoder.encode(req.getPassword());
+		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
 		// 2. 새로운 user 생성
-		User newUser = User.signup(req, encodedPassword);
+		User newUser = User.signup(requestDto, encodedPassword);
 
 		// 3. 새로운 user DB 저장
 		userRepository.save(newUser);
